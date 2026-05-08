@@ -2,6 +2,8 @@
 
 DMS plugin for breathing exercises for relaxation and focus.
 
+![Screenshot](screenshot.png)
+
 ## Features
 
 - Multiple breathing techniques: Deep Breathing, 4-7-8, Box Breathing, Equal Breathing, Resonance, Alternate Nostril
