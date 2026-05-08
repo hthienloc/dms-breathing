@@ -2,7 +2,7 @@
 
 DMS plugin for breathing exercises for relaxation and focus.
 
-![Screenshot](screenshot.png)
+<img src="screenshot.png" width="400" alt="Screenshot">
 
 ## Features
 
