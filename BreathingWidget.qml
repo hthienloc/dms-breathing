@@ -418,10 +418,10 @@ PluginComponent {
                             text: "Stop"
                             width: parent.width / 2 - 4
                             height: 40
-                            backgroundColor: Theme.errorContainer
-                            textColor: Theme.error
+                            backgroundColor: (root.isRunning || root.breathPhase !== "") ? Theme.errorContainer : Theme.surfaceContainerHigh
+                            textColor: (root.isRunning || root.breathPhase !== "") ? Theme.error : Theme.surfaceVariantText
                             iconName: "stop"
-                            visible: root.isRunning || root.breathPhase !== ""
+                            enabled: root.isRunning || root.breathPhase !== ""
                             onClicked: root.stopExercise()
                         }
                     }
