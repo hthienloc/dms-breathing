@@ -6,7 +6,7 @@ Guided breathing techniques for relaxation and focus.
 
 ## Install
 
-[**Install Now**](dms://plugin/install/breathing)
+[Install Now](dms://plugin/install/breathing)
 
 Or manually:
 ```bash
