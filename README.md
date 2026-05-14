@@ -1,43 +1,30 @@
 # Breathing Exercise
 
-DMS plugin for breathing exercises for relaxation and focus.
+Guided breathing techniques for relaxation and focus.
 
 <img src="screenshot.png" width="400" alt="Screenshot">
 
-## Features
+## Install
 
-- Multiple breathing techniques: Deep Breathing, 4-7-8, Box Breathing, Equal Breathing, Resonance, Alternate Nostril
-- Time preset selection (1m to 30m)
-- Visual breathing phase indicator
-- Pause/Resume/Stop controls
+[<kbd>Install Now</kbd>](dms://plugin/install/breathing)
 
-## Installation
-
+Or manually:
 ```bash
-# Clone the repository
-git clone https://github.com/hthienloc/dms-breathing.git
-
-# Create symlink in DMS plugins folder
-ln -s /path/to/dms-breathing ~/.config/DankMaterialShell/plugins/dms-breathing
+git clone https://github.com/hthienloc/dms-breathing ~/.config/DankMaterialShell/plugins/breathing
 ```
 
-## Enable in DMS
+## Features
 
-1. Open DMS Settings → Plugins
-2. Click "Scan for Plugins" or reload
-3. Enable "breathing" plugin
-4. Add to DankBar widget list
+- **6 techniques** - Deep Breathing, 4-7-8, Box, Equal, Resonance, Alternate Nostril
+- **Visual guide** - Phase indicator shows inhale/hold/exhale
+- **Duration presets** - Quick selection from 1m to 30m
 
-## Breathing Techniques
+## Usage
 
-| Technique | Inhale | Hold | Exhale | Hold After |
-|-----------|-------|------|-------|-----------|
-| Deep Breathing | 4s | 4s | 4s | - |
-| 4-7-8 | 4s | 7s | 8s | - |
-| Box Breathing | 4s | 4s | 4s | 4s |
-| Equal Breathing | 4s | - | 4s | - |
-| Resonance | 5.5s | - | 5.5s | - |
-| Alternate Nostril | 4s | - | 4s | 2s |
+| Action | Result |
+|--------|--------|
+| Left click | Open exercise selector |
+| Right click | Pause/resume |
 
 ## License
 
