@@ -18,14 +18,16 @@ git clone https://github.com/hthienloc/dms-breathing ~/.config/DankMaterialShell
 ## Features
 
 - **6 techniques** - Deep Breathing, 4-7-8, Box, Equal, Resonance, Alternate Nostril
-- **Visual guide** - Phase indicator shows inhale/hold/exhale
+- **Visual guide** - Phase indicator with icon and countdown
 - **Duration presets** - Quick selection from 1m to 30m
+- **Quick start** - Double-tap same exercise to begin
 
 ## Usage
 
 | Action | Result |
 |--------|--------|
 | Left click | Open exercise selector |
+| Double-tap exercise | Start immediately |
 | Right click | Pause/resume |
 
 ## License

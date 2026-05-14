@@ -383,8 +383,12 @@ PluginComponent {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    root.selectExercise(index);
-                                    if (root.isRunning) root.startExercise();
+                                    if (root.currentExerciseIndex === index && !root.isRunning) {
+                                        root.startExercise();
+                                    } else {
+                                        root.selectExercise(index);
+                                        if (root.isRunning) root.startExercise();
+                                    }
                                 }
                             }
                         }
