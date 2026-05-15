@@ -20,7 +20,7 @@ PluginComponent {
     readonly property int timerFontSize: Theme.fontSizeLarge
     readonly property int spacing: Theme.spacingM
 
-    readonly property var exercises: [
+readonly property var exercises: [
         {
             id: "deep",
             name: "Deep Breathing",
