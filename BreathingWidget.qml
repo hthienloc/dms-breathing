@@ -19,6 +19,7 @@ PluginComponent {
     readonly property int labelFontSize: Theme.fontSizeSmall
     readonly property int timerFontSize: Theme.fontSizeLarge
     readonly property int spacing: Theme.spacingM
+    readonly property int gridSpacing: 8
 
 readonly property var exercises: [
         {
