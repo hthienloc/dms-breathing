@@ -23,6 +23,18 @@ PluginSettings {
     }
 
     SettingsCard {
+        SectionTitle { text: "Usage Guide" }
+        UsageGuide {
+            items: [
+                "Select an exercise from the list to view its timing details.",
+                "Click the Start button to begin your guided breathing session.",
+                "Use the circular progress indicator to track your breath phases.",
+                "Shortcuts: Press 'Space' to Play/Pause, 'R' to Reset."
+            ]
+        }
+    }
+
+    SettingsCard {
         SectionTitle { text: "General" }
 
         ToggleSetting {
@@ -79,18 +91,6 @@ PluginSettings {
             label: "Sound Cues"
             description: "Play subtle sounds on phase transitions."
             defaultValue: true
-        }
-    }
-
-    SettingsCard {
-        SectionTitle { text: "Usage Guide" }
-        UsageGuide {
-            items: [
-                "Select an exercise from the list to view its timing details.",
-                "Click the Start button to begin your guided breathing session.",
-                "Use the circular progress indicator to track your breath phases.",
-                "Shortcuts: Press 'Space' to Play/Pause, 'R' to Reset."
-            ]
         }
     }
 }
