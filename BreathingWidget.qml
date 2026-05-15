@@ -275,75 +275,20 @@ PluginComponent {
                 spacing: 8
 
                 // Active display when running
-                Rectangle {
+                StatusDisplay {
                     width: parent.width
-                    height: 100
-                    radius: Theme.cornerRadius
-                    color: root.isRunning ? Theme.primary : Theme.surfaceContainerHigh
-                    visible: root.isRunning || root.breathPhase !== ""
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 48
-
-                        DankIcon {
-                            name: root.isPaused ? "pause" : 
-                                  (breathPhase === "inhale" ? "trending_up" : 
-                                   breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
-                                   breathPhase === "exhale" ? "trending_down" : "air")
-                            size: 64
-                            color: root.isRunning ? Theme.onPrimary : Theme.surfaceVariantText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: 120
-                            height: parent.height
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 4
-
-                                StyledText {
-                                    text: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
-                                          breathPhase === "hold" ? "Hold" : 
-                                          breathPhase === "exhale" ? "Breathe Out" :
-                                          breathPhase === "holdAfterExhale" ? "Hold" : "---")
-                                    font.pixelSize: 18
-                                    font.weight: Font.Bold
-                                    color: root.isRunning ? Theme.onPrimary : Theme.surfaceText
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-
-                                Row {
-                                    spacing: 8
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    StyledText {
-                                        text: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
-                                        font.pixelSize: 28
-                                        font.weight: Font.Bold
-                                        color: root.isRunning ? Theme.onPrimary : Theme.surfaceVariantText
-                                    }
-
-                                    StyledText {
-                                        text: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
-                                        font.pixelSize: 16
-                                        color: root.isRunning ? Theme.onPrimary : Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled: root.currentExerciseIndex >= 0
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.togglePause()
-                    }
+                    active: root.isRunning || root.breathPhase !== ""
+                    iconName: root.isPaused ? "pause" : 
+                             (breathPhase === "inhale" ? "trending_up" : 
+                              breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
+                              breathPhase === "exhale" ? "trending_down" : "air")
+                    title: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
+                               breathPhase === "hold" ? "Hold" : 
+                               breathPhase === "exhale" ? "Breathe Out" :
+                               breathPhase === "holdAfterExhale" ? "Hold" : "---")
+                    subtitle: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
+                    infoText: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
+                    onClicked: root.togglePause()
                 }
 
                 // Exercises grid
@@ -353,46 +298,19 @@ PluginComponent {
 
                     Repeater {
                         model: root.exercises
-                        delegate: Rectangle {
+                        delegate: ActionTile {
                             width: root.cellWidth
                             height: root.cellHeight
-                            radius: Theme.cornerRadius
-                            color: root.currentExerciseIndex === index ? Theme.primary : Theme.surfaceContainerHigh
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 4
-                                DankIcon {
-                                    name: modelData.icon
-                                    size: root.iconSize
-                                    color: root.currentExerciseIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                StyledText {
-                                    text: modelData.name
-                                    font.pixelSize: root.fontSize
-                                    font.weight: Font.Medium
-                                    color: root.currentExerciseIndex === index ? Theme.onPrimary : Theme.surfaceText
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                StyledText {
-                                    text: modelData.inhaleDuration + "-" + modelData.holdDuration + "-" + modelData.exhaleDuration
-                                    font.pixelSize: 11
-                                    color: root.currentExerciseIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (root.currentExerciseIndex === index && !root.isRunning) {
-                                        root.startExercise();
-                                    } else {
-                                        root.selectExercise(index);
-                                        if (root.isRunning) root.startExercise();
-                                    }
+                            title: modelData.name
+                            subtitle: modelData.inhaleDuration + "-" + modelData.holdDuration + "-" + modelData.exhaleDuration
+                            icon: modelData.icon
+                            active: root.currentExerciseIndex === index
+                            onClicked: {
+                                if (root.currentExerciseIndex === index && !root.isRunning) {
+                                    root.startExercise();
+                                } else {
+                                    root.selectExercise(index);
+                                    if (root.isRunning) root.startExercise();
                                 }
                             }
                         }
