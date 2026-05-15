@@ -16,9 +16,9 @@ PluginComponent {
 
     readonly property real cellWidth: (root.popoutWidth - (root.gridSpacing * 2) - 16) / 2
     readonly property real cellHeight: 100
-    readonly property real iconSize: 32
-    readonly property real fontSize: 14
-    readonly property int gridSpacing: 8
+    readonly property int labelFontSize: Theme.fontSizeSmall
+    readonly property int timerFontSize: Theme.fontSizeLarge
+    readonly property int spacing: Theme.spacingM
 
     readonly property var exercises: [
         {
@@ -29,7 +29,7 @@ PluginComponent {
             holdDuration: 4,
             exhaleDuration: 4,
             cycles: 4,
-            icon: "air"
+            iconName: "air"
         },
         {
             id: "478",
@@ -39,7 +39,7 @@ PluginComponent {
             holdDuration: 7,
             exhaleDuration: 8,
             cycles: 4,
-            icon: "bedtime"
+            iconName: "bedtime"
         },
         {
             id: "box",
@@ -50,7 +50,7 @@ PluginComponent {
             exhaleDuration: 4,
             holdAfterExhale: 4,
             cycles: 4,
-            icon: "crop_square"
+            iconName: "crop_square"
         },
         {
             id: "equal",
@@ -60,7 +60,7 @@ PluginComponent {
             holdDuration: 0,
             exhaleDuration: 4,
             cycles: 6,
-            icon: "sync_alt"
+            iconName: "sync_alt"
         },
         {
             id: "resonance",
@@ -70,7 +70,7 @@ PluginComponent {
             holdDuration: 0,
             exhaleDuration: 5.5,
             cycles: 6,
-            icon: "waves"
+            iconName: "waves"
         },
         {
             id: "alternate",
@@ -81,7 +81,7 @@ PluginComponent {
             exhaleDuration: 4,
             holdAfterExhale: 2,
             cycles: 6,
-            icon: "swap_horiz"
+            iconName: "swap_horiz"
         }
     ]
 
@@ -313,7 +313,7 @@ PluginComponent {
                             height: root.cellHeight
                             title: modelData.name
                             subtitle: modelData.inhaleDuration + "-" + modelData.holdDuration + "-" + modelData.exhaleDuration
-                            icon: modelData.icon
+                            iconName: modelData.icon
                             active: root.currentExerciseIndex === index
                             onClicked: {
                                 if (root.currentExerciseIndex === index && !root.isRunning) {
