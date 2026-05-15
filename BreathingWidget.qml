@@ -93,19 +93,6 @@ PluginComponent {
     property string breathPhase: ""
     property int phaseTimeRemaining: 0
     property int totalTimeRemaining: 0
- 
-    Shortcut {
-        sequence: "Space"
-        enabled: root.isPopoutOpen
-        onActivated: root.togglePause()
-    }
- 
-    Shortcut {
-        sequence: "R"
-        enabled: root.isPopoutOpen
-        onActivated: root.stopExercise()
-    }
-
     property bool enableHaptic: pluginData.enableHaptic !== undefined ? pluginData.enableHaptic : true
     property int selectedDuration: 5
     property int calculatedCycles: 0
@@ -283,12 +270,22 @@ PluginComponent {
 
     popoutContent: Component {
         PopoutComponent {
+            id: mainPopout
             width: root.popoutWidth
             headerText: "Breathing Exercises"
             detailsText: isRunning ? (exercises[currentExerciseIndex].name + " • Cycle " + currentCycle + "/" + root.calculatedCycles) : ""
             showCloseButton: false
+            focus: true
+
+            property var parentPopout: null
+            PluginShortcut {
+                parentPopout: mainPopout.parentPopout
+                onSpacePressed: () => root.togglePause()
+                onRPressed: () => root.stopExercise()
+            }
 
             Column {
+                id: mainColumn
                 width: parent.width
                 spacing: 8
 
