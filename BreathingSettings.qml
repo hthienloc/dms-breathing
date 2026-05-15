@@ -49,6 +49,21 @@ PluginSettings {
             visible: pluginData.enableAutoStart ?? false
         }
 
+        SelectionSetting {
+            settingKey: "defaultDuration"
+            label: "Default Duration"
+            description: "Session length for auto-started exercises."
+            options: [
+                { label: "1 minute", value: "1" },
+                { label: "2 minutes", value: "2" },
+                { label: "3 minutes", value: "3" },
+                { label: "5 minutes", value: "5" },
+                { label: "10 minutes", value: "10" }
+            ]
+            defaultValue: "5"
+            visible: pluginData.enableAutoStart ?? false
+        }
+
         ToggleSetting {
             settingKey: "showHints"
             label: "Show Hints"

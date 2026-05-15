@@ -219,7 +219,9 @@ PluginComponent {
         onTriggered: {
             if (pluginData.enableAutoStart && pluginData.autoStartExercise !== undefined) {
                 var idx = parseInt(pluginData.autoStartExercise);
+                var dur = parseInt(pluginData.defaultDuration ?? 5);
                 if (idx >= 0 && idx < root.exercises.length) {
+                    root.selectedDuration = dur;
                     selectExercise(idx);
                     startExercise();
                 }
@@ -227,7 +229,10 @@ PluginComponent {
         }
     }
 
-    Component.onCompleted: autoStartTimer.start()
+    Component.onCompleted: {
+        root.selectedDuration = parseInt(pluginData.defaultDuration ?? 5);
+        autoStartTimer.start();
+    }
 
     horizontalBarPill: Component {
         Item {
