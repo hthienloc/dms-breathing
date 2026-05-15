@@ -93,6 +93,18 @@ PluginComponent {
     property string breathPhase: ""
     property int phaseTimeRemaining: 0
     property int totalTimeRemaining: 0
+ 
+    Shortcut {
+        sequence: "Space"
+        enabled: root.isPopoutOpen
+        onActivated: root.togglePause()
+    }
+ 
+    Shortcut {
+        sequence: "R"
+        enabled: root.isPopoutOpen
+        onActivated: root.stopExercise()
+    }
 
     property bool enableHaptic: pluginData.enableHaptic !== undefined ? pluginData.enableHaptic : true
     property int selectedDuration: 5
@@ -412,6 +424,10 @@ PluginComponent {
                     HintItem {
                         icon: "mouse"
                         text: "Double-click an exercise tile to start it immediately."
+                    }
+                    HintItem {
+                        icon: "keyboard"
+                        text: "Press 'Space' to Pause/Resume, 'R' to Reset."
                     }
                 }
             }
