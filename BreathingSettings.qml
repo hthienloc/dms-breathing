@@ -4,6 +4,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Plugins
+import "./components"
 
 PluginSettings {
     id: root
@@ -18,109 +19,66 @@ PluginSettings {
         { name: "Alternate Nostril", id: "alternate" }
     ]
 
-    StyledText {
-        width: parent.width
-        text: "Breathing Exercise Settings"
-        font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
-        color: Theme.primary
+    PluginHeader {
+        title: "Breathing Exercise Settings"
     }
 
-    StyledRect {
-        width: parent.width
-        height: generalColumn.implicitHeight + Theme.spacingL * 2
-        radius: Theme.cornerRadius
-        color: Theme.surfaceContainer
+    SettingsCard {
+        SectionTitle { text: "General" }
 
-        Column {
-            id: generalColumn
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingM
+        ToggleSetting {
+            settingKey: "enableAutoStart"
+            label: "Auto-start Exercise"
+            description: "Start exercise automatically on login."
+            defaultValue: false
+        }
 
-            StyledText {
-                text: "General"
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
-                color: Theme.surfaceText
-            }
+        SelectionSetting {
+            settingKey: "autoStartExercise"
+            label: "Default Exercise"
+            description: "Exercise to start automatically."
+            options: [
+                { label: "Deep Breathing", value: "0" },
+                { label: "4-7-8 Breathing", value: "1" },
+                { label: "Box Breathing", value: "2" },
+                { label: "Equal Breathing", value: "3" },
+                { label: "Resonance", value: "4" },
+                { label: "Alternate Nostril", value: "5" }
+            ]
+            defaultValue: "0"
+            visible: pluginData.enableAutoStart ?? false
+        }
 
-            ToggleSetting {
-                settingKey: "enableAutoStart"
-                label: "Auto-start Exercise"
-                description: "Start exercise automatically on login."
-                defaultValue: false
-            }
-
-            SelectionSetting {
-                settingKey: "autoStartExercise"
-                label: "Default Exercise"
-                description: "Exercise to start automatically."
-                options: [
-                    { label: "Deep Breathing", value: "0" },
-                    { label: "4-7-8 Breathing", value: "1" },
-                    { label: "Box Breathing", value: "2" },
-                    { label: "Equal Breathing", value: "3" },
-                    { label: "Resonance", value: "4" },
-                    { label: "Alternate Nostril", value: "5" }
-                ]
-                defaultValue: "0"
-                visible: root.loadValue("enableAutoStart", false)
-            }
+        ToggleSetting {
+            settingKey: "showHints"
+            label: "Show Hints"
+            description: "Display helpful usage tips and shortcuts at the bottom of the popout."
+            defaultValue: true
         }
     }
 
-    StyledRect {
-        width: parent.width
-        height: feedbackColumn.implicitHeight + Theme.spacingL * 2
-        radius: Theme.cornerRadius
-        color: Theme.surfaceContainer
+    SettingsCard {
+        SectionTitle { text: "Feedback" }
 
-        Column {
-            id: feedbackColumn
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingM
-
-            StyledText {
-                text: "Feedback"
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
-                color: Theme.surfaceText
-            }
-
-            ToggleSetting {
-                settingKey: "enableHaptic"
-                label: "Haptic Feedback"
-                description: "Vibrate on phase transitions."
-                defaultValue: true
-            }
+        ToggleSetting {
+            settingKey: "enableHaptic"
+            label: "Haptic Feedback"
+            description: "Vibrate on phase transitions."
+            defaultValue: true
         }
-    StyledRect {
-        width: parent.width
-        height: hintColumn.implicitHeight + Theme.spacingL * 2
-        radius: Theme.cornerRadius
-        color: Theme.surfaceContainer
+        
+        ToggleSetting {
+            settingKey: "enableSound"
+            label: "Sound Cues"
+            description: "Play subtle sounds on phase transitions."
+            defaultValue: true
+        }
+    }
 
-        Column {
-            id: hintColumn
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingM
-
-            StyledText {
-                text: "Interface"
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
-                color: Theme.surfaceText
-            }
-
-            ToggleSetting {
-                settingKey: "showHints"
-                label: "Show Hints"
-                description: "Display helpful usage tips and shortcuts at the bottom of the popout."
-                defaultValue: true
-            }
+    SettingsCard {
+        SectionTitle { text: "Quick Guide" }
+        InfoText {
+            text: "• Select an exercise to see details\n• Click Start to begin guided breathing\n• Use the Progress indicator to track your session"
         }
     }
 }
