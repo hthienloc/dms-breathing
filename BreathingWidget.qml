@@ -374,7 +374,7 @@ PluginComponent {
                             text: "Stop"
                             width: parent.width / 2 - 4
                             height: 40
-                            backgroundColor: (root.isRunning || root.breathPhase !== "") ? Theme.errorContainer : Theme.surfaceContainerHigh
+                            backgroundColor: (root.isRunning || root.breathPhase !== "") ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : Theme.surfaceContainerHigh
                             textColor: (root.isRunning || root.breathPhase !== "") ? Theme.error : Theme.surfaceVariantText
                             iconName: "stop"
                             enabled: root.isRunning || root.breathPhase !== ""
