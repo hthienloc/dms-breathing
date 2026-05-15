@@ -83,9 +83,14 @@ PluginSettings {
     }
 
     SettingsCard {
-        SectionTitle { text: "Quick Guide" }
-        InfoText {
-            text: "• Select an exercise to see details\n• Click Start to begin guided breathing\n• Use the Progress indicator to track your session"
+        SectionTitle { text: "Usage Guide" }
+        UsageGuide {
+            items: [
+                "Select an exercise from the list to view its timing details.",
+                "Click the Start button to begin your guided breathing session.",
+                "Use the circular progress indicator to track your breath phases.",
+                "Shortcuts: Press 'Space' to Play/Pause, 'R' to Reset."
+            ]
         }
     }
 }
