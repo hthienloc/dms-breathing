@@ -55,13 +55,6 @@ PluginSettings {
             maximum: 30
             defaultValue: 5
         }
-
-        ToggleSetting {
-            settingKey: "showHints"
-            label: "Show Hints"
-            description: "Display helpful usage tips and shortcuts at the bottom of the popout."
-            defaultValue: true
-        }
     }
 
     SettingsCard {
@@ -78,6 +71,17 @@ PluginSettings {
             settingKey: "enableSound"
             label: "Sound Cues"
             description: "Play subtle sounds on phase transitions."
+            defaultValue: true
+        }
+    }
+
+    SettingsCard {
+        SectionTitle { text: "Behavior" }
+
+        ToggleSetting {
+            settingKey: "showHints"
+            label: "Show Hints"
+            description: "Display helpful usage tips and shortcuts at the bottom of the popout."
             defaultValue: true
         }
     }
