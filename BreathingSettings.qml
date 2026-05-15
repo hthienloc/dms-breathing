@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import qs.Common
-import qs.Services
 import qs.Widgets
 import qs.Modules.Plugins
 import "../dms-common"
@@ -54,7 +53,6 @@ PluginSettings {
             description: "Session length for auto-started exercises (minutes)."
             minimum: 1
             maximum: 30
-            step: 1
             defaultValue: 5
         }
 
