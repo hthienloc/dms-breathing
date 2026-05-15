@@ -313,7 +313,7 @@ PluginComponent {
                             height: root.cellHeight
                             title: modelData.name
                             subtitle: modelData.inhaleDuration + "-" + modelData.holdDuration + "-" + modelData.exhaleDuration
-                            iconName: modelData.icon
+                            iconName: modelData.iconName
                             active: root.currentExerciseIndex === index
                             onClicked: {
                                 if (root.currentExerciseIndex === index && !root.isRunning) {
