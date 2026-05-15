@@ -46,22 +46,16 @@ PluginSettings {
                 { label: "Alternate Nostril", value: "5" }
             ]
             defaultValue: "0"
-            visible: pluginData.enableAutoStart ?? false
         }
 
-        SelectionSetting {
+        SliderSetting {
             settingKey: "defaultDuration"
             label: "Default Duration"
-            description: "Session length for auto-started exercises."
-            options: [
-                { label: "1 minute", value: "1" },
-                { label: "2 minutes", value: "2" },
-                { label: "3 minutes", value: "3" },
-                { label: "5 minutes", value: "5" },
-                { label: "10 minutes", value: "10" }
-            ]
-            defaultValue: "5"
-            visible: pluginData.enableAutoStart ?? false
+            description: "Session length for auto-started exercises (minutes)."
+            minimum: 1
+            maximum: 30
+            step: 1
+            defaultValue: 5
         }
 
         ToggleSetting {

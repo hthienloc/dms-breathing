@@ -230,7 +230,7 @@ PluginComponent {
     }
 
     Component.onCompleted: {
-        root.selectedDuration = parseInt(pluginData.defaultDuration ?? 5);
+        root.selectedDuration = pluginData.defaultDuration !== undefined ? pluginData.defaultDuration : 5;
         autoStartTimer.start();
     }
 
@@ -273,7 +273,7 @@ PluginComponent {
         PopoutComponent {
             width: root.popoutWidth
             headerText: "Breathing Exercises"
-            detailsText: isRunning ? "Cycle " + currentCycle + "/" + root.calculatedCycles : ""
+            detailsText: isRunning ? (exercises[currentExerciseIndex].name + " • Cycle " + currentCycle + "/" + root.calculatedCycles) : ""
             showCloseButton: false
 
             Column {
