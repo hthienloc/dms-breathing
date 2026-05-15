@@ -21,7 +21,7 @@ PluginComponent {
     readonly property int spacing: Theme.spacingM
     readonly property int gridSpacing: 8
 
-readonly property var exercises: [
+    readonly property var exercises: [
         {
             id: "deep",
             name: "Deep Breathing",
@@ -283,6 +283,7 @@ readonly property var exercises: [
                     StatusDisplay {
                         id: statusDisplay
                         width: parent.width
+                        large: true
                         active: root.isRunning || root.breathPhase !== ""
                         iconName: root.isPaused ? "pause" : 
                                  (breathPhase === "inhale" ? "trending_up" : 
@@ -306,6 +307,7 @@ readonly property var exercises: [
                 Flow {
                     width: parent.width
                     spacing: root.gridSpacing
+                    visible: !root.isRunning
 
                     Repeater {
                         model: root.exercises
