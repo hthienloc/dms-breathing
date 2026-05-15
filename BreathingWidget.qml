@@ -275,20 +275,30 @@ PluginComponent {
                 spacing: 8
 
                 // Active display when running
-                StatusDisplay {
+                Item {
                     width: parent.width
-                    active: root.isRunning || root.breathPhase !== ""
-                    iconName: root.isPaused ? "pause" : 
-                             (breathPhase === "inhale" ? "trending_up" : 
-                              breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
-                              breathPhase === "exhale" ? "trending_down" : "air")
-                    title: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
-                               breathPhase === "hold" ? "Hold" : 
-                               breathPhase === "exhale" ? "Breathe Out" :
-                               breathPhase === "holdAfterExhale" ? "Hold" : "---")
-                    subtitle: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
-                    infoText: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
-                    onClicked: root.togglePause()
+                    height: statusDisplay.height
+
+                    StatusDisplay {
+                        id: statusDisplay
+                        width: parent.width
+                        active: root.isRunning || root.breathPhase !== ""
+                        iconName: root.isPaused ? "pause" : 
+                                 (breathPhase === "inhale" ? "trending_up" : 
+                                  breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
+                                  breathPhase === "exhale" ? "trending_down" : "air")
+                        title: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
+                                   breathPhase === "hold" ? "Hold" : 
+                                   breathPhase === "exhale" ? "Breathe Out" :
+                                   breathPhase === "holdAfterExhale" ? "Hold" : "---")
+                        subtitle: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
+                        infoText: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.togglePause()
+                    }
                 }
 
                 // Exercises grid
