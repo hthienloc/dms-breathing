@@ -4,9 +4,13 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Plugins
+import "./components"
+
 
 PluginComponent {
     id: root
+    readonly property bool showHints: pluginData.showHints ?? true
+
 
     pillRightClickAction: () => root.togglePause()
 
@@ -459,6 +463,19 @@ PluginComponent {
                                 }
                             }
                         }
+                    }
+                }
+                HintSection {
+                    width: parent.width
+                    showHints: root.showHints
+
+                    HintItem {
+                        icon: "mouse"
+                        text: "Right-click bar icon to quickly toggle Start/Pause."
+                    }
+                    HintItem {
+                        icon: "mouse"
+                        text: "Double-click an exercise tile to start it immediately."
                     }
                 }
             }
