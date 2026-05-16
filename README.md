@@ -40,3 +40,9 @@ git clone https://github.com/hthienloc/dms-breathing ~/.config/DankMaterialShell
 ## License
 
 GPL-3.0
+
+## Roadmap / TODO
+
+- [ ] **Custom technique builder** to allow users to define their own inhale/hold/exhale times.
+- [ ] **Haptic feedback support** for phase changes (inhale/exhale transitions).
+- [ ] **Session history tracker** to monitor daily breathing streaks and statistics.
