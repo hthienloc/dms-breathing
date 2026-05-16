@@ -43,6 +43,8 @@ GPL-3.0
 
 ## Roadmap / TODO
 
-- [ ] **Custom technique builder** to allow users to define their own inhale/hold/exhale times.
-- [ ] **Haptic feedback support** for phase changes (inhale/exhale transitions).
-- [ ] **Session history tracker** to monitor daily breathing streaks and statistics.
+- [ ] **Custom Exercises:** Interface to create personal breathing patterns (custom inhale/hold/exhale/rest timings).
+- [ ] **Sound Guidance:** Optional voice-over or distinct acoustic cues for each phase.
+- [ ] **Advanced Statistics:** Daily/weekly logs and streak tracking for mindfulness consistency.
+- [ ] **System Focus Sync:** Automatically enable "Do Not Disturb" mode while an exercise is active.
+- [ ] **Visual Customization:** Multiple animation styles for the breathing indicator (expanding circle, wave, etc.).
