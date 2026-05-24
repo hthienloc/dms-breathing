@@ -76,6 +76,23 @@ PluginSettings {
     }
 
     SettingsCard {
+        SectionTitle { text: "Appearance" }
+
+        SelectionSetting {
+            settingKey: "animationStyle"
+            label: "Animation Style"
+            description: "Visual style of the breathing visualizer."
+            options: [
+                { label: "Classic Card", value: "classic" },
+                { label: "Expanding Circle", value: "circle" },
+                { label: "Flowing Wave", value: "wave" },
+                { label: "Pulsating Glow", value: "pulse" }
+            ]
+            defaultValue: "pulse"
+        }
+    }
+
+    SettingsCard {
         SectionTitle { text: "Behavior" }
 
         ToggleSetting {

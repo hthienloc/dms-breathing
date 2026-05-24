@@ -47,4 +47,4 @@ GPL-3.0
 - [ ] **Sound Guidance:** Optional voice-over or distinct acoustic cues for each phase.
 - [ ] **Advanced Statistics:** Daily/weekly logs and streak tracking for mindfulness consistency.
 - [ ] **System Focus Sync:** Automatically enable "Do Not Disturb" mode while an exercise is active.
-- [ ] **Visual Customization:** Multiple animation styles for the breathing indicator (expanding circle, wave, etc.).
+- [x] **Visual Customization:** Multiple animation styles for the breathing indicator (expanding circle, wave, etc.).

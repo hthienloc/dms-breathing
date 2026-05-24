@@ -86,6 +86,76 @@ PluginComponent {
         }
     ]
 
+    property real breathProgress: 0.0
+    readonly property string animationStyle: pluginData.animationStyle ?? "pulse"
+
+    readonly property color phaseColor: {
+        if (breathPhase === "inhale") return Theme.primary; // Focus
+        if (breathPhase === "hold") return Theme.warning;   // Hold
+        if (breathPhase === "exhale") return Theme.success;  // Release
+        return Theme.surfaceVariantText; // Silent / Rest
+    }
+
+    onBreathPhaseChanged: {
+        if (!isRunning || currentExerciseIndex < 0) {
+            progressAnimation.stop();
+            breathProgress = 0.0;
+            return;
+        }
+
+        var ex = exercises[currentExerciseIndex];
+        var duration = 0;
+        var targetVal = 0.0;
+
+        if (breathPhase === "inhale") {
+            duration = ex.inhaleDuration * 1000;
+            targetVal = 1.0;
+        } else if (breathPhase === "hold") {
+            duration = ex.holdDuration * 1000;
+            targetVal = 1.0;
+        } else if (breathPhase === "exhale") {
+            duration = ex.exhaleDuration * 1000;
+            targetVal = 0.0;
+        } else if (breathPhase === "holdAfterExhale") {
+            duration = (ex.holdAfterExhale || 0) * 1000;
+            targetVal = 0.0;
+        }
+
+        if (duration > 0) {
+            progressAnimation.stop();
+            progressAnimation.duration = duration;
+            progressAnimation.from = breathProgress;
+            progressAnimation.to = targetVal;
+            progressAnimation.start();
+        } else {
+            breathProgress = targetVal;
+        }
+    }
+
+    onIsRunningChanged: {
+        if (!isRunning) {
+            progressAnimation.stop();
+            breathProgress = 0.0;
+        }
+    }
+
+    onIsPausedChanged: {
+        if (isRunning) {
+            if (isPaused) {
+                progressAnimation.pause();
+            } else {
+                progressAnimation.resume();
+            }
+        }
+    }
+
+    NumberAnimation {
+        id: progressAnimation
+        target: root
+        property: "breathProgress"
+        easing.type: Easing.InOutQuad
+    }
+
     property bool isRunning: false
     property bool isPaused: false
     property int currentExerciseIndex: -1
@@ -122,12 +192,12 @@ PluginComponent {
         var cycleTime = ex.inhaleDuration + ex.holdDuration + ex.exhaleDuration + (ex.holdAfterExhale || 0);
         root.calculatedCycles = Math.floor((root.selectedDuration * 60) / cycleTime);
         
+        isRunning = true;
+        isPaused = false;
         currentCycle = 1;
         breathPhase = "inhale";
         phaseTimeRemaining = ex.inhaleDuration * 1000;
         totalTimeRemaining = root.selectedDuration * 60 * 1000;
-        isRunning = true;
-        isPaused = false;
         exerciseTimer.start();
     }
 
@@ -290,29 +360,269 @@ PluginComponent {
                 spacing: 8
 
                 // Active display when running
-                Item {
+                StyledRect {
                     width: parent.width
-                    height: statusDisplay.height
+                    height: root.isRunning ? (root.animationStyle === "classic" ? 96 : 220) : 0
+                    visible: root.isRunning
+                    radius: Theme.cornerRadiusLarge
+                    color: Theme.surfaceContainerHigh
+                    clip: true
 
-                    StatusDisplay {
-                        id: statusDisplay
-                        width: parent.width
-                        large: true
-                        active: root.isRunning || root.breathPhase !== ""
-                        iconName: root.isPaused ? "pause" : 
-                                 (breathPhase === "inhale" ? "trending_up" : 
-                                  breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
-                                  breathPhase === "exhale" ? "trending_down" : "air")
-                        title: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
-                                   breathPhase === "hold" ? "Hold" : 
-                                   breathPhase === "exhale" ? "Breathe Out" :
-                                   breathPhase === "holdAfterExhale" ? "Hold" : "---")
-                        subtitle: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
-                        infoText: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
+                    Behavior on height {
+                        NumberAnimation { duration: 250; easing.type: Easing.InOutQuad }
+                    }
+
+                    // 1. Expanding Circle Visualizer
+                    Item {
+                        anchors.fill: parent
+                        visible: root.animationStyle === "circle"
+
+                        // Outer thin ring
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: (100 + root.breathProgress * 80) * 1.3
+                            height: width
+                            radius: width / 2
+                            color: "transparent"
+                            border.color: Qt.rgba(root.phaseColor.r, root.phaseColor.g, root.phaseColor.b, 0.15)
+                            border.width: 1
+                        }
+
+                        // Middle glowing ring
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: (100 + root.breathProgress * 80) * 1.15
+                            height: width
+                            radius: width / 2
+                            color: "transparent"
+                            border.color: Qt.rgba(root.phaseColor.r, root.phaseColor.g, root.phaseColor.b, 0.3)
+                            border.width: 1
+                        }
+
+                        // Core expanding circle
+                        Rectangle {
+                            id: coreCircle
+                            anchors.centerIn: parent
+                            width: 100 + root.breathProgress * 80
+                            height: width
+                            radius: width / 2
+                            color: Qt.rgba(root.phaseColor.r, root.phaseColor.g, root.phaseColor.b, 0.12)
+                            border.color: root.phaseColor
+                            border.width: 3
+
+                            Behavior on color { ColorAnimation { duration: 500 } }
+                            Behavior on border.color { ColorAnimation { duration: 500 } }
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 4
+
+                                StyledText {
+                                    text: root.isPaused ? "Paused" : (
+                                        breathPhase === "inhale" ? "Breathe In" : 
+                                        breathPhase === "hold" ? "Hold" : 
+                                        breathPhase === "exhale" ? "Breathe Out" :
+                                        breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                    )
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.bold: true
+                                    color: Theme.surfaceText
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+
+                                StyledText {
+                                    text: Math.ceil(phaseTimeRemaining / 1000) + "s"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.bold: true
+                                    color: root.phaseColor
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Flowing Wave Visualizer
+                    Item {
+                        anchors.fill: parent
+                        visible: root.animationStyle === "wave"
+
+                        Canvas {
+                            id: waveCanvas
+                            anchors.fill: parent
+                            property real waveOffset: 0.0
+
+                            onPaint: {
+                                var ctx = getContext("2d");
+                                ctx.clearRect(0, 0, width, height);
+
+                                var baseHeight = height * 0.75;
+                                var waveHeight = height * 0.35 * root.breathProgress;
+
+                                // Wave 1 (Back wave, lower opacity)
+                                drawWave(ctx, baseHeight + 5, waveHeight, waveOffset, 0.015, Qt.rgba(root.phaseColor.r, root.phaseColor.g, root.phaseColor.b, 0.15));
+                                // Wave 2 (Front wave, higher opacity)
+                                drawWave(ctx, baseHeight, waveHeight * 0.8, waveOffset + 2.5, 0.025, Qt.rgba(root.phaseColor.r, root.phaseColor.g, root.phaseColor.b, 0.3));
+                            }
+
+                            function drawWave(ctx, base, amp, offset, freq, fillColor) {
+                                ctx.fillStyle = fillColor;
+                                ctx.beginPath();
+                                ctx.moveTo(0, height);
+                                for (var x = 0; x <= width; x += 5) {
+                                    var y = base - Math.sin(x * freq + offset) * amp;
+                                    ctx.lineTo(x, y);
+                                }
+                                ctx.lineTo(width, height);
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+
+                            Timer {
+                                running: root.isRunning && !root.isPaused && root.animationStyle === "wave"
+                                interval: 16
+                                repeat: true
+                                onTriggered: {
+                                    waveCanvas.waveOffset += 0.05;
+                                    waveCanvas.requestPaint();
+                                }
+                            }
+                        }
+
+                        // Info text in center (wave overlay)
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            StyledText {
+                                text: root.isPaused ? "Paused" : (
+                                    breathPhase === "inhale" ? "Breathe In" : 
+                                    breathPhase === "hold" ? "Hold" : 
+                                    breathPhase === "exhale" ? "Breathe Out" :
+                                    breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                )
+                                font.pixelSize: Theme.fontSizeXLarge
+                                font.bold: true
+                                color: Theme.surfaceText
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            StyledText {
+                                text: Math.ceil(phaseTimeRemaining / 1000) + "s"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                                color: root.phaseColor
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    // 3. Pulsating Glow Visualizer
+                    Item {
+                        anchors.fill: parent
+                        visible: root.animationStyle === "pulse"
+
+                        // Ambient glow background
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 240
+                            height: 240
+                            radius: 120
+                            color: root.phaseColor
+                            opacity: 0.05 + root.breathProgress * 0.15
+                            scale: 0.8 + root.breathProgress * 0.4
+
+                            Behavior on color { ColorAnimation { duration: 500 } }
+                        }
+
+                        // Pulsating core circle
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 140
+                            height: 140
+                            radius: 70
+                            color: root.phaseColor
+                            opacity: 0.15 + root.breathProgress * 0.45
+                            scale: 0.95 + Math.sin(Date.now() / 400) * 0.03
+
+                            Behavior on color { ColorAnimation { duration: 500 } }
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 2
+
+                                DankIcon {
+                                    name: root.isPaused ? "pause" : (
+                                        breathPhase === "inhale" ? "trending_up" : 
+                                        breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
+                                        breathPhase === "exhale" ? "trending_down" : "air"
+                                    )
+                                    size: Theme.iconSizeMedium
+                                    color: Theme.surfaceText
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+
+                                StyledText {
+                                    text: root.isPaused ? "Paused" : (
+                                        breathPhase === "inhale" ? "Breathe In" : 
+                                        breathPhase === "hold" ? "Hold" : 
+                                        breathPhase === "exhale" ? "Breathe Out" :
+                                        breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                    )
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.bold: true
+                                    color: Theme.surfaceText
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+
+                                StyledText {
+                                    text: Math.ceil(phaseTimeRemaining / 1000) + "s"
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.bold: true
+                                    color: Theme.surfaceText
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    opacity: 0.8
+                                }
+                            }
+                        }
+                    }
+
+                    // 4. Classic Card Visualizer
+                    Item {
+                        anchors.fill: parent
+                        visible: root.animationStyle === "classic"
+
+                        StatusDisplay {
+                            id: statusDisplay
+                            width: parent.width
+                            large: true
+                            active: root.isRunning || root.breathPhase !== ""
+                            iconName: root.isPaused ? "pause" : 
+                                     (breathPhase === "inhale" ? "trending_up" : 
+                                      breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
+                                      breathPhase === "exhale" ? "trending_down" : "air")
+                            title: root.isPaused ? "Paused" : (breathPhase === "inhale" ? "Breathe In" : 
+                                       breathPhase === "hold" ? "Hold" : 
+                                       breathPhase === "exhale" ? "Breathe Out" :
+                                       breathPhase === "holdAfterExhale" ? "Hold" : "---")
+                            subtitle: (Math.ceil(phaseTimeRemaining / 1000)) + "s"
+                            infoText: "/ " + Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
+                        }
+                    }
+
+                    // Total session timer in top-right
+                    StyledText {
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.margins: Theme.spacingM
+                        text: Math.floor(totalTimeRemaining / 60000) + ":" + ((Math.floor((totalTimeRemaining % 60000) / 1000) + "").padStart(2, "0"))
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        visible: root.animationStyle !== "classic"
                     }
 
                     MouseArea {
                         anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
                         onClicked: root.togglePause()
                     }
                 }
