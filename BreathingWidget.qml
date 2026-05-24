@@ -639,7 +639,7 @@ PluginComponent {
                             width: root.cellWidth
                             height: root.cellHeight
                             title: modelData.name
-                            subtitle: (modelData.inhaleDuration || 0) + "-" + (modelData.holdDuration || 0) + "-" + (modelData.exhaleDuration || 0)
+                            subtitle: (modelData.inhaleDuration || 0) + "-" + (modelData.holdDuration || 0) + "-" + (modelData.exhaleDuration || 0) + "-" + (modelData.holdAfterExhale || 0)
                             iconName: modelData.iconName
                             active: root.currentExerciseIndex === index
                             onClicked: {
