@@ -181,22 +181,53 @@ PluginComponent {
     property bool enableSound: pluginData.enableSound !== undefined ? pluginData.enableSound : true
 
     property bool isPlayerRunning: false
+    property bool isTestingSound: false
+
+    function toggleTestSound() {
+        if (isTestingSound) {
+            stopTestSound();
+        } else {
+            startTestSound();
+        }
+    }
+
+    function startTestSound() {
+        if (isRunning) {
+            stopExercise();
+        }
+        isTestingSound = true;
+        var SOCK = "/tmp/dms-breathing-mpv.sock";
+        var soundFile = pluginDir + "/sounds/chime.ogg";
+        var initCmd = "rm -f '" + SOCK + "'; mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --volume=100 --audio-samplerate=48000 --speed=1.0 --input-ipc-server='" + SOCK + "' '" + soundFile + "' 2>&1";
+        console.log("[BreathingWidget] startTestSound cmd:", initCmd);
+        Proc.runCommand("start-breathing-test-sound", ["bash", "-c", initCmd], function(output, exitCode) {
+            console.log("[BreathingWidget] MPV exited! code:", exitCode, "output:", output);
+            isTestingSound = false;
+            var debugCmd = "printf '%s' 'MPV exited with code " + exitCode + ". Output: " + output.replace(/'/g, "") + "' > /tmp/breathing-mpv-error.txt";
+            Proc.runCommand("write-debug", ["bash", "-c", debugCmd], null, 0);
+        }, 0, -1);
+    }
+
+    function stopTestSound() {
+        isTestingSound = false;
+        stopSound();
+    }
 
     function playSoundCmd(speed) {
+        var SOCK = "/tmp/dms-breathing-mpv.sock";
         var soundFile = pluginDir + "/sounds/chime.ogg";
-        var socket = "/tmp/dms-breathing-mpv.sock";
-        return "mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --speed=" + speed + " --input-ipc-server='" + socket + "' '" + soundFile + "' > /dev/null 2>&1";
+        return "mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --volume=100 --audio-samplerate=48000 --speed=" + speed + " --input-ipc-server='" + SOCK + "' '" + soundFile + "' > /dev/null 2>&1";
     }
 
     function stopSound() {
         isPlayerRunning = false;
-        var cmd = "pkill -f 'breathing/sounds/chime.ogg'; pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock";
+        var cmd = "echo '{\"command\":[\"quit\"]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock 2>/dev/null; rm -f /tmp/dms-breathing-mpv.sock";
         Proc.runCommand("stop-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
     function pauseSound() {
         if (!enableSound || !isPlayerRunning) return;
-        var cmd = "echo '{\"command\": [\"set_property\", \"pause\", true]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
+        var cmd = "echo '{\"command\":[\"set_property\",\"pause\",true]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
         Proc.runCommand("pause-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
@@ -206,7 +237,7 @@ PluginComponent {
             playSound(breathPhase);
             return;
         }
-        var cmd = "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
+        var cmd = "echo '{\"command\":[\"set_property\",\"pause\",false]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
         Proc.runCommand("resume-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
@@ -229,14 +260,14 @@ PluginComponent {
         console.log("[BreathingWidget] isPlayerRunning:", isPlayerRunning, "calculated speed:", speed);
 
         if (isPlayerRunning) {
-            var cmd = "echo '{\"command\": [\"set_property\", \"speed\", " + speed + "]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock' && " +
-                      "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
-            console.log("[BreathingWidget] Sending IPC speed warp cmd:", cmd);
+            var cmd = "echo '{\"command\":[\"set_property\",\"speed\"," + speed + "]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock && " +
+                      "echo '{\"command\":[\"set_property\",\"pause\",false]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
             Proc.runCommand("warp-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
         } else {
             isPlayerRunning = true;
-            var initCmd = "pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock; " + playSoundCmd(speed);
-            console.log("[BreathingWidget] Launching mpv with initCmd:", initCmd);
+            var SOCK = "/tmp/dms-breathing-mpv.sock";
+            var initCmd = "rm -f '" + SOCK + "'; " + playSoundCmd(speed);
+            console.log("[BreathingWidget] Launching mpv:", initCmd);
             Proc.runCommand("start-breathing-sound", ["bash", "-c", initCmd], null, 0, -1);
         }
     }
@@ -264,6 +295,8 @@ PluginComponent {
     }
 
     function startExercise() {
+        isTestingSound = false;
+        isPlayerRunning = false;
         if (currentExerciseIndex < 0) {
             currentExerciseIndex = 0;
         }
@@ -767,6 +800,16 @@ PluginComponent {
                             enabled: root.isRunning || root.breathPhase !== ""
                             onClicked: root.stopExercise()
                         }
+                    }
+
+                    DankButton {
+                        text: root.isTestingSound ? "Stop Test" : "Test Sound"
+                        width: parent.width
+                        height: 40
+                        backgroundColor: root.isTestingSound ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : Theme.surfaceContainerHigh
+                        textColor: root.isTestingSound ? Theme.error : Theme.surfaceVariantText
+                        iconName: root.isTestingSound ? "volume_off" : "volume_up"
+                        onClicked: root.toggleTestSound()
                     }
 
                     // Duration presets
