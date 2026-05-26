@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -97,6 +98,8 @@ PluginComponent {
     }
 
     onBreathPhaseChanged: {
+        root.playSound(breathPhase);
+
         if (!isRunning || currentExerciseIndex < 0) {
             progressAnimation.stop();
             breathProgress = 0.0;
@@ -136,6 +139,7 @@ PluginComponent {
         if (!isRunning) {
             progressAnimation.stop();
             breathProgress = 0.0;
+            root.stopSound();
         }
     }
 
@@ -143,8 +147,10 @@ PluginComponent {
         if (isRunning) {
             if (isPaused) {
                 progressAnimation.pause();
+                root.pauseSound();
             } else {
                 progressAnimation.resume();
+                root.resumeSound();
             }
         }
     }
@@ -166,6 +172,50 @@ PluginComponent {
     property bool enableHaptic: pluginData.enableHaptic !== undefined ? pluginData.enableHaptic : true
     property int selectedDuration: 5
     property int calculatedCycles: 0
+
+    property bool enableSound: pluginData.enableSound !== undefined ? pluginData.enableSound : true
+
+    function stopSound() {
+        Quickshell.execDetached(["sh", "-c", "pkill -f \"mpv.*dms-breathing/sounds/\"; rm -f /tmp/dms-breathing-mpv.sock"]);
+    }
+
+    function pauseSound() {
+        if (!enableSound) return;
+        Quickshell.execDetached(["sh", "-c", "echo '{\"command\": [\"set_property\", \"pause\", true]}' | socat - /tmp/dms-breathing-mpv.sock"]);
+    }
+
+    function resumeSound() {
+        if (!enableSound || !isRunning || isPaused) return;
+        Quickshell.execDetached(["sh", "-c", "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - /tmp/dms-breathing-mpv.sock"]);
+    }
+
+    function playSound(phase) {
+        if (!enableSound || !isRunning || isPaused) return;
+
+        var speed = "1.0";
+        if (phase === "inhale") {
+            speed = "1.3";
+        } else if (phase === "hold" || phase === "holdAfterExhale") {
+            speed = "1.0";
+        } else if (phase === "exhale") {
+            speed = "0.7";
+        }
+
+        var fullPath = Qt.resolvedUrl("sounds/chime.wav").toString().replace("file://", "");
+        var cmd = "if [ -S /tmp/dms-breathing-mpv.sock ] && pgrep -f \"mpv.*dms-breathing/sounds/\" >/dev/null; then " +
+                  "echo '{\"command\": [\"set_property\", \"speed\", " + speed + "]}' | socat - /tmp/dms-breathing-mpv.sock && " +
+                  "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - /tmp/dms-breathing-mpv.sock; " +
+                  "else " +
+                  "pkill -f \"mpv.*dms-breathing/sounds/\"; " +
+                  "rm -f /tmp/dms-breathing-mpv.sock; " +
+                  "mpv --no-video --loop-file=inf --input-ipc-server=/tmp/dms-breathing-mpv.sock --audio-pitch-correction=no --speed=" + speed + " \"" + fullPath + "\" >/dev/null 2>&1 & " +
+                  "fi";
+        Quickshell.execDetached(["sh", "-c", cmd]);
+    }
+
+    Component.onDestruction: {
+        stopSound();
+    }
 
     readonly property var timePresets: [
         { label: "1m", minutes: 1 },
