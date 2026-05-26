@@ -74,6 +74,25 @@ PluginSettings {
             defaultValue: true
         }
 
+        ToggleSetting {
+            settingKey: "enableTwoTone"
+            label: "Two-Tone Model"
+            description: "Play a distinct falling pitch during exhale (default plays rising pitch on inhale only)."
+            defaultValue: false
+        }
+
+        SelectionSetting {
+            settingKey: "soundType"
+            label: "Sound Cue Type"
+            description: "Select which sound cue to play during exercises."
+            options: [
+                { label: "Singing Bowl Chime (Default)", value: "chime" },
+                { label: "Ambient Meditation Music", value: "meditation" },
+                { label: "Custom Sound File", value: "custom" }
+            ]
+            defaultValue: "chime"
+        }
+
         SliderSetting {
             settingKey: "defaultSoundVolume"
             label: "Default Volume"
@@ -89,7 +108,7 @@ PluginSettings {
         StringSetting {
             settingKey: "customSoundPath"
             label: "Custom Sound File"
-            description: "Absolute path to a custom audio file (.ogg, .wav, .mp3). Leave empty to use the default chime."
+            description: "Absolute path to custom audio. Only active when Sound Cue Type is set to Custom Sound File."
             placeholder: "/home/user/sounds/my-sound.ogg"
             defaultValue: ""
         }

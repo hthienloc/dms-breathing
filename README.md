@@ -47,6 +47,7 @@ GPL-3.0
 
 - [ ] **Custom Exercises:** Interface to create personal breathing patterns (custom inhale/hold/exhale/rest timings).
 - [x] **Sound Guidance:** Premium real-time pitch-warping singing bowl audio cues for each phase.
+- [ ] **Guided Voice Tracks:** Add male and female voice guidance tracks for step-by-step breathing instructions (assets pending search/acquisition).
 - [ ] **Advanced Statistics:** Daily/weekly logs and streak tracking for mindfulness consistency.
 - [ ] **System Focus Sync:** Automatically enable "Do Not Disturb" mode while an exercise is active.
 - [x] **Visual Customization:** Multiple animation styles for the breathing indicator (expanding circle, wave, etc.).

@@ -185,6 +185,8 @@ PluginComponent {
     property int calculatedCycles: 0
 
     property bool enableSound: pluginData.enableSound !== undefined ? pluginData.enableSound : true
+    property bool enableTwoTone: pluginData.enableTwoTone !== undefined ? pluginData.enableTwoTone : false
+    property string soundType: pluginData.soundType !== undefined ? pluginData.soundType : "chime"
 
     property bool isPlayerRunning: false
     property bool isTestingSound: false
@@ -264,8 +266,15 @@ PluginComponent {
 
     function playSoundCmd() {
         var SOCK = "/tmp/dms-breathing-mpv.sock";
-        var customPath = pluginData.customSoundPath !== undefined ? pluginData.customSoundPath.trim() : "";
-        var soundFile = (customPath.length > 0) ? customPath : (pluginDir + "/sounds/chime.ogg");
+        var soundFile = pluginDir + "/sounds/chime.ogg";
+        if (root.soundType === "meditation") {
+            soundFile = pluginDir + "/sounds/meditation.mp3";
+        } else if (root.soundType === "custom") {
+            var customPath = pluginData.customSoundPath !== undefined ? pluginData.customSoundPath.trim() : "";
+            if (customPath.length > 0) {
+                soundFile = customPath;
+            }
+        }
         return "mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --volume=" + root.soundVolume + " --audio-samplerate=48000 --input-ipc-server='" + SOCK + "' '" + soundFile + "' > /dev/null 2>&1";
     }
 
@@ -295,26 +304,41 @@ PluginComponent {
     function playSound(phase) {
         if (!enableSound || !isRunning || isPaused) return;
 
-        var speed;
-        if (phase === "inhale")           speed = "1.1";
-        else if (phase === "hold")        speed = "1.0";
-        else if (phase === "exhale")      speed = "0.9";
-        else                              speed = "0.9";  // holdAfterExhale
+        var shouldStrike = (phase === "inhale") || (root.enableTwoTone && phase === "exhale");
+        var speed = "1.0";
+        if (phase === "inhale") {
+            speed = "1.1";
+        } else if (phase === "exhale" || phase === "holdAfterExhale") {
+            speed = "0.9";
+        }
 
         if (isPlayerRunning) {
             var cmd = "echo '{\"command\":[\"set_property\",\"speed\"," + speed + "]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock && " +
                       "echo '{\"command\":[\"set_property\",\"pause\",false]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
+            if (shouldStrike) {
+                cmd += " && echo '{\"command\":[\"seek\",0,\"absolute\"]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
+            }
             Proc.runCommand("play-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
+
+            if (phase === "inhale") {
+                root.startVolumeFade(0, root.soundVolume, 800);
+            } else {
+                var volCmd = "echo '{\"command\":[\"set_property\",\"volume\"," + root.soundVolume + "]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
+                Proc.runCommand("update-volume", ["bash", "-c", volCmd], null, 0, -1);
+            }
         } else {
             isPlayerRunning = true;
             var SOCK = "/tmp/dms-breathing-mpv.sock";
             var initCmd = "rm -f '" + SOCK + "'; " + playSoundCmd();
             Proc.runCommand("start-breathing-sound", ["bash", "-c", initCmd], null, 0, -1);
             var capturedSpeed = speed;
-            Qt.callLater(function() {
-                var setCmd = "echo '{\"command\":[\"set_property\",\"speed\"," + capturedSpeed + "]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
-                Proc.runCommand("play-breathing-sound", ["bash", "-c", setCmd], null, 0, -1);
-            });
+            var strikePart = shouldStrike ? "echo '{\"command\":[\"seek\",0,\"absolute\"]}' | socat - UNIX-CONNECT:" + SOCK + " 2>/dev/null && " : "";
+            var setCmd = "for i in {1..30}; do if [ -S " + SOCK + " ]; then " +
+                         "echo '{\"command\":[\"set_property\",\"speed\"," + capturedSpeed + "]}' | socat - UNIX-CONNECT:" + SOCK + " 2>/dev/null && " +
+                         strikePart +
+                         "echo '{\"command\":[\"set_property\",\"pause\",false]}' | socat - UNIX-CONNECT:" + SOCK + " 2>/dev/null && break; " +
+                         "fi; sleep 0.05; done";
+            Proc.runCommand("play-breathing-sound", ["bash", "-c", setCmd], null, 0, -1);
         }
     }
 
@@ -342,9 +366,11 @@ PluginComponent {
 
     function startExercise() {
         if (isTestingSound) {
-            stopTestSound();
+            isTestingSound = false;
+            isPlayerRunning = true;
+        } else {
+            isPlayerRunning = false;
         }
-        isPlayerRunning = false;
         if (currentExerciseIndex < 0) {
             currentExerciseIndex = 0;
         }
@@ -399,6 +425,20 @@ PluginComponent {
         onTriggered: {
             phaseTimeRemaining -= 1000;
             totalTimeRemaining -= 1000;
+            
+            if (phaseTimeRemaining === 1000) {
+                var ex = exercises[currentExerciseIndex];
+                var nextIsInhale = false;
+                if (breathPhase === "exhale" && !(ex.holdAfterExhale > 0)) {
+                    nextIsInhale = (currentCycle < root.calculatedCycles);
+                } else if (breathPhase === "holdAfterExhale") {
+                    nextIsInhale = (currentCycle < root.calculatedCycles);
+                }
+
+                if (nextIsInhale && enableSound) {
+                    root.startVolumeFade(root.soundVolume, 0, 950);
+                }
+            }
             
             if (phaseTimeRemaining <= 0) {
                 var ex = exercises[currentExerciseIndex];
