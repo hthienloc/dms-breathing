@@ -183,21 +183,21 @@ PluginComponent {
     property bool isPlayerRunning: false
 
     function playSoundCmd(speed) {
-        var soundFile = pluginDir + "/sounds/chime.wav";
+        var soundFile = pluginDir + "/sounds/chime.ogg";
         var socket = "/tmp/dms-breathing-mpv.sock";
-        return "mpv --no-video --no-config --loop-file=inf --audio-pitch-correction=no --speed=" + speed + " --input-ipc-server='" + socket + "' '" + soundFile + "' > /dev/null 2>&1";
+        return "mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --speed=" + speed + " --input-ipc-server='" + socket + "' '" + soundFile + "' > /dev/null 2>&1";
     }
 
     function stopSound() {
         isPlayerRunning = false;
-        var cmd = "pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock";
-        Proc.runCommand("stop-breathing-sound", ["bash", "-c", cmd], null, 0);
+        var cmd = "pkill -f 'breathing/sounds/chime.ogg'; pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock";
+        Proc.runCommand("stop-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
     function pauseSound() {
         if (!enableSound || !isPlayerRunning) return;
         var cmd = "echo '{\"command\": [\"set_property\", \"pause\", true]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
-        Proc.runCommand("pause-breathing-sound", ["bash", "-c", cmd], null, 0);
+        Proc.runCommand("pause-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
     function resumeSound() {
@@ -207,11 +207,15 @@ PluginComponent {
             return;
         }
         var cmd = "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
-        Proc.runCommand("resume-breathing-sound", ["bash", "-c", cmd], null, 0);
+        Proc.runCommand("resume-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
     }
 
     function playSound(phase) {
-        if (!enableSound || !isRunning || isPaused) return;
+        console.log("[BreathingWidget] playSound called for phase:", phase, "enableSound:", enableSound, "isRunning:", isRunning, "isPaused:", isPaused);
+        if (!enableSound || !isRunning || isPaused) {
+            console.log("[BreathingWidget] playSound returning early!");
+            return;
+        }
 
         var speed = "1.0";
         if (phase === "inhale") {
@@ -222,16 +226,21 @@ PluginComponent {
             speed = "0.7";
         }
 
+        console.log("[BreathingWidget] isPlayerRunning:", isPlayerRunning, "calculated speed:", speed);
+
         if (isPlayerRunning) {
             var cmd = "echo '{\"command\": [\"set_property\", \"speed\", " + speed + "]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock' && " +
                       "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
-            Proc.runCommand("warp-breathing-sound", ["bash", "-c", cmd], null, 0);
+            console.log("[BreathingWidget] Sending IPC speed warp cmd:", cmd);
+            Proc.runCommand("warp-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
         } else {
             isPlayerRunning = true;
             var initCmd = "pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock; " + playSoundCmd(speed);
-            Proc.runCommand("start-breathing-sound", ["bash", "-c", initCmd], null, 0);
+            console.log("[BreathingWidget] Launching mpv with initCmd:", initCmd);
+            Proc.runCommand("start-breathing-sound", ["bash", "-c", initCmd], null, 0, -1);
         }
     }
+
 
     Component.onDestruction: {
         stopSound();
@@ -369,6 +378,7 @@ PluginComponent {
     }
 
     Component.onCompleted: {
+        console.log("[BreathingWidget] Component completed successfully! enableSound is:", enableSound);
         root.selectedDuration = pluginData.defaultDuration !== undefined ? pluginData.defaultDuration : 5;
         autoStartTimer.start();
     }
