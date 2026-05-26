@@ -7,7 +7,9 @@ Guided breathing techniques for relaxation and focus.
 ## Install
 
 
-**Required:** This plugin requires [dms-common](https://github.com/hthienloc/dms-common) to be installed.
+**Required:** This plugin requires:
+- [dms-common](https://github.com/hthienloc/dms-common) to be installed.
+- `mpv` and `socat` (for dynamic pitch-warping audio cues).
 
 ```bash
 # 1. Install shared components
@@ -44,7 +46,7 @@ GPL-3.0
 ## Roadmap / TODO
 
 - [ ] **Custom Exercises:** Interface to create personal breathing patterns (custom inhale/hold/exhale/rest timings).
-- [ ] **Sound Guidance:** Optional voice-over or distinct acoustic cues for each phase.
+- [x] **Sound Guidance:** Premium real-time pitch-warping singing bowl audio cues for each phase.
 - [ ] **Advanced Statistics:** Daily/weekly logs and streak tracking for mindfulness consistency.
 - [ ] **System Focus Sync:** Automatically enable "Do Not Disturb" mode while an exercise is active.
 - [x] **Visual Customization:** Multiple animation styles for the breathing indicator (expanding circle, wave, etc.).
