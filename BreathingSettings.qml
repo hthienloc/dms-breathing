@@ -73,6 +73,26 @@ PluginSettings {
             description: "Play subtle sounds on phase transitions."
             defaultValue: true
         }
+
+        SliderSetting {
+            settingKey: "defaultSoundVolume"
+            label: "Default Volume"
+            description: "Default volume for breathing sound cues."
+            defaultValue: 80
+            minimum: 0
+            maximum: 100
+            unit: "%"
+            leftIcon: "volume_down"
+            rightIcon: "volume_up"
+        }
+
+        StringSetting {
+            settingKey: "customSoundPath"
+            label: "Custom Sound File"
+            description: "Absolute path to a custom audio file (.ogg, .wav, .mp3). Leave empty to use the default chime."
+            placeholder: "/home/user/sounds/my-sound.ogg"
+            defaultValue: ""
+        }
     }
 
     SettingsCard {
