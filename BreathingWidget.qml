@@ -10,6 +10,11 @@ import "../dms-common"
 
 PluginComponent {
     id: root
+    readonly property string pluginDir: {
+        var url = Qt.resolvedUrl(".").toString();
+        if (url.startsWith("file://")) url = url.replace("file://", "");
+        return url.endsWith("/") ? url.substring(0, url.length - 1) : url;
+    }
     readonly property bool showHints: pluginData.showHints ?? true
 
 
@@ -175,18 +180,34 @@ PluginComponent {
 
     property bool enableSound: pluginData.enableSound !== undefined ? pluginData.enableSound : true
 
+    property bool isPlayerRunning: false
+
+    function playSoundCmd(speed) {
+        var soundFile = pluginDir + "/sounds/chime.wav";
+        var socket = "/tmp/dms-breathing-mpv.sock";
+        return "mpv --no-video --no-config --loop-file=inf --audio-pitch-correction=no --speed=" + speed + " --input-ipc-server='" + socket + "' '" + soundFile + "' > /dev/null 2>&1";
+    }
+
     function stopSound() {
-        Quickshell.execDetached(["sh", "-c", "pkill -f \"mpv.*dms-breathing/sounds/\"; rm -f /tmp/dms-breathing-mpv.sock"]);
+        isPlayerRunning = false;
+        var cmd = "pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock";
+        Proc.runCommand("stop-breathing-sound", ["bash", "-c", cmd], null, 0);
     }
 
     function pauseSound() {
-        if (!enableSound) return;
-        Quickshell.execDetached(["sh", "-c", "echo '{\"command\": [\"set_property\", \"pause\", true]}' | socat - /tmp/dms-breathing-mpv.sock"]);
+        if (!enableSound || !isPlayerRunning) return;
+        var cmd = "echo '{\"command\": [\"set_property\", \"pause\", true]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
+        Proc.runCommand("pause-breathing-sound", ["bash", "-c", cmd], null, 0);
     }
 
     function resumeSound() {
         if (!enableSound || !isRunning || isPaused) return;
-        Quickshell.execDetached(["sh", "-c", "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - /tmp/dms-breathing-mpv.sock"]);
+        if (!isPlayerRunning) {
+            playSound(breathPhase);
+            return;
+        }
+        var cmd = "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
+        Proc.runCommand("resume-breathing-sound", ["bash", "-c", cmd], null, 0);
     }
 
     function playSound(phase) {
@@ -201,16 +222,15 @@ PluginComponent {
             speed = "0.7";
         }
 
-        var fullPath = Qt.resolvedUrl("sounds/chime.wav").toString().replace("file://", "");
-        var cmd = "if [ -S /tmp/dms-breathing-mpv.sock ] && pgrep -f \"mpv.*dms-breathing/sounds/\" >/dev/null; then " +
-                  "echo '{\"command\": [\"set_property\", \"speed\", " + speed + "]}' | socat - /tmp/dms-breathing-mpv.sock && " +
-                  "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - /tmp/dms-breathing-mpv.sock; " +
-                  "else " +
-                  "pkill -f \"mpv.*dms-breathing/sounds/\"; " +
-                  "rm -f /tmp/dms-breathing-mpv.sock; " +
-                  "mpv --no-video --loop-file=inf --input-ipc-server=/tmp/dms-breathing-mpv.sock --audio-pitch-correction=no --speed=" + speed + " \"" + fullPath + "\" >/dev/null 2>&1 & " +
-                  "fi";
-        Quickshell.execDetached(["sh", "-c", cmd]);
+        if (isPlayerRunning) {
+            var cmd = "echo '{\"command\": [\"set_property\", \"speed\", " + speed + "]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock' && " +
+                      "echo '{\"command\": [\"set_property\", \"pause\", false]}' | socat - 'UNIX-CONNECT:/tmp/dms-breathing-mpv.sock'";
+            Proc.runCommand("warp-breathing-sound", ["bash", "-c", cmd], null, 0);
+        } else {
+            isPlayerRunning = true;
+            var initCmd = "pkill -f 'dms-breathing-mpv.sock'; rm -f /tmp/dms-breathing-mpv.sock; " + playSoundCmd(speed);
+            Proc.runCommand("start-breathing-sound", ["bash", "-c", initCmd], null, 0);
+        }
     }
 
     Component.onDestruction: {
@@ -414,7 +434,7 @@ PluginComponent {
                     width: parent.width
                     height: root.isRunning ? (root.animationStyle === "classic" ? 96 : 220) : 0
                     visible: root.isRunning
-                    radius: Theme.cornerRadiusLarge
+                    radius: Theme.cornerRadius
                     color: Theme.surfaceContainerHigh
                     clip: true
 
@@ -606,7 +626,7 @@ PluginComponent {
                                         breathPhase === "hold" || breathPhase === "holdAfterExhale" ? "horizontal_rule" :
                                         breathPhase === "exhale" ? "trending_down" : "air"
                                     )
-                                    size: Theme.iconSizeMedium
+                                    size: Theme.iconSize
                                     color: Theme.surfaceText
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
