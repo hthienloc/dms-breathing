@@ -321,7 +321,7 @@ PluginComponent {
             Proc.runCommand("play-breathing-sound", ["bash", "-c", cmd], null, 0, -1);
 
             if (phase === "inhale") {
-                root.startVolumeFade(0, root.soundVolume, 800);
+                root.startVolumeFade(Math.round(root.soundVolume * 0.35), root.soundVolume, 800);
             } else {
                 var volCmd = "echo '{\"command\":[\"set_property\",\"volume\"," + root.soundVolume + "]}' | socat - UNIX-CONNECT:/tmp/dms-breathing-mpv.sock";
                 Proc.runCommand("update-volume", ["bash", "-c", volCmd], null, 0, -1);
@@ -436,7 +436,7 @@ PluginComponent {
                 }
 
                 if (nextIsInhale && enableSound) {
-                    root.startVolumeFade(root.soundVolume, 0, 950);
+                    root.startVolumeFade(root.soundVolume, Math.round(root.soundVolume * 0.35), 950);
                 }
             }
             
