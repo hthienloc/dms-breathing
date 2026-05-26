@@ -820,6 +820,37 @@ PluginComponent {
                     width: parent.width
                     spacing: 8
 
+                    // Duration presets
+                    Row {
+                        width: parent.width
+                        spacing: 4
+                        visible: !root.isRunning
+
+                        Repeater {
+                            model: root.timePresets
+                            delegate: Rectangle {
+                                width: (parent.width - 28) / 8
+                                height: 28
+                                radius: Theme.cornerRadius
+                                color: root.selectedDuration === modelData.minutes ? Theme.primary : Theme.surfaceContainerHigh
+
+                                StyledText {
+                                    text: modelData.label
+                                    font.pixelSize: 12
+                                    font.weight: root.selectedDuration === modelData.minutes ? Font.Bold : Font.Normal
+                                    color: root.selectedDuration === modelData.minutes ? Theme.onPrimary : Theme.surfaceText
+                                    anchors.centerIn: parent
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: root.selectedDuration = modelData.minutes;
+                                }
+                            }
+                        }
+                    }
+
                     Row {
                         width: parent.width
                         spacing: 8
@@ -872,37 +903,6 @@ PluginComponent {
                         value: root.soundVolume
                         unit: "%"
                         onSliderValueChanged: root.soundVolume = newValue
-                    }
-
-                    // Duration presets
-                    Row {
-                        width: parent.width
-                        spacing: 4
-                        visible: !root.isRunning
-
-                        Repeater {
-                            model: root.timePresets
-                            delegate: Rectangle {
-                                width: (parent.width - 28) / 8
-                                height: 28
-                                radius: Theme.cornerRadius
-                                color: root.selectedDuration === modelData.minutes ? Theme.primary : Theme.surfaceContainerHigh
-
-                                StyledText {
-                                    text: modelData.label
-                                    font.pixelSize: 12
-                                    font.weight: root.selectedDuration === modelData.minutes ? Font.Bold : Font.Normal
-                                    color: root.selectedDuration === modelData.minutes ? Theme.onPrimary : Theme.surfaceText
-                                    anchors.centerIn: parent
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.selectedDuration = modelData.minutes;
-                                }
-                            }
-                        }
                     }
                 }
                 HintSection {
