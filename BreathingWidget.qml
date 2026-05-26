@@ -249,7 +249,15 @@ PluginComponent {
         isTestingSound = true;
         var SOCK = "/tmp/dms-breathing-mpv.sock";
         var soundFile = pluginDir + "/sounds/chime.ogg";
-        var initCmd = "rm -f '" + SOCK + "'; mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --volume=100 --audio-samplerate=48000 --speed=1.0 --input-ipc-server='" + SOCK + "' '" + soundFile + "' 2>&1";
+        if (root.soundType === "meditation") {
+            soundFile = pluginDir + "/sounds/meditation.mp3";
+        } else if (root.soundType === "custom") {
+            var customPath = pluginData.customSoundPath !== undefined ? pluginData.customSoundPath.trim() : "";
+            if (customPath.length > 0) {
+                soundFile = customPath;
+            }
+        }
+        var initCmd = "rm -f '" + SOCK + "'; mpv --no-video --no-config --loop=inf --audio-pitch-correction=no --volume=" + root.soundVolume + " --audio-samplerate=48000 --speed=1.0 --input-ipc-server='" + SOCK + "' '" + soundFile + "' 2>&1";
         console.log("[BreathingWidget] startTestSound cmd:", initCmd);
         Proc.runCommand("start-breathing-test-sound", ["bash", "-c", initCmd], function(output, exitCode) {
             console.log("[BreathingWidget] MPV exited! code:", exitCode, "output:", output);
