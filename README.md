@@ -6,16 +6,8 @@ Guided breathing techniques for relaxation and focus.
 
 ## Install
 
-
-**Required:** This plugin requires:
-- [dms-common](https://github.com/hthienloc/dms-common) to be installed.
-- `mpv` and `socat` (for dynamic pitch-warping audio cues).
-
+Use the DMS CLI:
 ```bash
-# 1. Install shared components
-git clone https://github.com/hthienloc/dms-common ~/.config/DankMaterialShell/plugins/dms-common
-
-# 2. Install this plugin
 dms plugins install breathing
 ```
 
