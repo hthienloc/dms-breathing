@@ -3,54 +3,50 @@ import QtQuick.Controls
 import qs.Common
 import qs.Widgets
 import qs.Modules.Plugins
-import "../dms-common"
+import "./dms-common"
 
 PluginSettings {
     id: root
     pluginId: "breathing"
 
     readonly property var exercises: [
-        { name: "Deep Breathing", id: "deep" },
-        { name: "4-7-8 Breathing", id: "478" },
-        { name: "Box Breathing", id: "box" },
-        { name: "Equal Breathing", id: "equal" },
-        { name: "Resonance", id: "resonance" },
-        { name: "Alternate Nostril", id: "alternate" }
+        { name: I18n.tr("Deep Breathing"), id: "deep" },
+        { name: I18n.tr("4-7-8 Breathing"), id: "478" },
+        { name: I18n.tr("Box Breathing"), id: "box" },
+        { name: I18n.tr("Equal Breathing"), id: "equal" },
+        { name: I18n.tr("Resonance"), id: "resonance" },
+        { name: I18n.tr("Alternate Nostril"), id: "alternate" }
     ]
 
-    PluginHeader {
-        title: "Breathing Exercise Settings"
-    }
-
     SettingsCard {
-        SectionTitle { text: "General" }
+        SectionTitle { text: I18n.tr("General"); icon: "tune" }
 
         ToggleSetting {
             settingKey: "enableAutoStart"
-            label: "Auto-start Exercise"
-            description: "Start exercise automatically on login."
+            label: I18n.tr("Auto-start Exercise")
+            description: I18n.tr("Start exercise automatically on login.")
             defaultValue: false
         }
 
         SelectionSetting {
             settingKey: "autoStartExercise"
-            label: "Default Exercise"
-            description: "Exercise to start automatically."
+            label: I18n.tr("Default Exercise")
+            description: I18n.tr("Exercise to start automatically.")
             options: [
-                { label: "Deep Breathing", value: "0" },
-                { label: "4-7-8 Breathing", value: "1" },
-                { label: "Box Breathing", value: "2" },
-                { label: "Equal Breathing", value: "3" },
-                { label: "Resonance", value: "4" },
-                { label: "Alternate Nostril", value: "5" }
+                { label: I18n.tr("Deep Breathing"), value: "0" },
+                { label: I18n.tr("4-7-8 Breathing"), value: "1" },
+                { label: I18n.tr("Box Breathing"), value: "2" },
+                { label: I18n.tr("Equal Breathing"), value: "3" },
+                { label: I18n.tr("Resonance"), value: "4" },
+                { label: I18n.tr("Alternate Nostril"), value: "5" }
             ]
             defaultValue: "0"
         }
 
         SliderSetting {
             settingKey: "defaultDuration"
-            label: "Default Duration"
-            description: "Session length for auto-started exercises (minutes)."
+            label: I18n.tr("Default Duration")
+            description: I18n.tr("Session length for auto-started exercises (minutes).")
             minimum: 1
             maximum: 30
             defaultValue: 5
@@ -58,45 +54,45 @@ PluginSettings {
     }
 
     SettingsCard {
-        SectionTitle { text: "Feedback" }
+        SectionTitle { text: I18n.tr("Feedback"); icon: "vibration" }
 
         ToggleSetting {
             settingKey: "enableHaptic"
-            label: "Haptic Feedback"
-            description: "Vibrate on phase transitions."
+            label: I18n.tr("Haptic Feedback")
+            description: I18n.tr("Vibrate on phase transitions.")
             defaultValue: true
         }
         
         ToggleSetting {
             settingKey: "enableSound"
-            label: "Sound Cues"
-            description: "Play subtle sounds on phase transitions."
+            label: I18n.tr("Sound Cues")
+            description: I18n.tr("Play subtle sounds on phase transitions.")
             defaultValue: true
         }
 
         ToggleSetting {
             settingKey: "enableTwoTone"
-            label: "Two-Tone Model"
-            description: "Play a distinct falling pitch during exhale (default plays rising pitch on inhale only)."
+            label: I18n.tr("Two-Tone Model")
+            description: I18n.tr("Play a distinct falling pitch during exhale (default plays rising pitch on inhale only).")
             defaultValue: false
         }
 
         SelectionSetting {
             settingKey: "soundType"
-            label: "Sound Cue Type"
-            description: "Select which sound cue to play during exercises."
+            label: I18n.tr("Sound Cue Type")
+            description: I18n.tr("Select which sound cue to play during exercises.")
             options: [
-                { label: "Singing Bowl Chime (Default)", value: "chime" },
-                { label: "Ambient Meditation Music", value: "meditation" },
-                { label: "Custom Sound File", value: "custom" }
+                { label: I18n.tr("Singing Bowl Chime (Default)"), value: "chime" },
+                { label: I18n.tr("Ambient Meditation Music"), value: "meditation" },
+                { label: I18n.tr("Custom Sound File"), value: "custom" }
             ]
             defaultValue: "chime"
         }
 
         SliderSetting {
             settingKey: "defaultSoundVolume"
-            label: "Default Volume"
-            description: "Default volume for breathing sound cues."
+            label: I18n.tr("Default Volume")
+            description: I18n.tr("Default volume for breathing sound cues.")
             defaultValue: 80
             minimum: 0
             maximum: 100
@@ -107,38 +103,42 @@ PluginSettings {
 
         StringSetting {
             settingKey: "customSoundPath"
-            label: "Custom Sound File"
-            description: "Absolute path to custom audio. Only active when Sound Cue Type is set to Custom Sound File."
+            label: I18n.tr("Custom Sound File")
+            description: I18n.tr("Absolute path to custom audio. Only active when Sound Cue Type is set to Custom Sound File.")
             placeholder: "/home/user/sounds/my-sound.ogg"
             defaultValue: ""
         }
     }
 
     SettingsCard {
-        SectionTitle { text: "Appearance" }
+        SectionTitle { text: I18n.tr("Appearance"); icon: "palette" }
 
         SelectionSetting {
             settingKey: "animationStyle"
-            label: "Animation Style"
-            description: "Visual style of the breathing visualizer."
+            label: I18n.tr("Animation Style")
+            description: I18n.tr("Visual style of the breathing visualizer.")
             options: [
-                { label: "Classic Card", value: "classic" },
-                { label: "Expanding Circle", value: "circle" },
-                { label: "Flowing Wave", value: "wave" },
-                { label: "Pulsating Glow", value: "pulse" }
+                { label: I18n.tr("Classic Card"), value: "classic" },
+                { label: I18n.tr("Expanding Circle"), value: "circle" },
+                { label: I18n.tr("Flowing Wave"), value: "wave" },
+                { label: I18n.tr("Pulsating Glow"), value: "pulse" }
             ]
             defaultValue: "pulse"
         }
     }
 
     SettingsCard {
-        SectionTitle { text: "Behavior" }
+        SectionTitle { text: I18n.tr("Behavior"); icon: "settings" }
 
         ToggleSetting {
             settingKey: "showHints"
-            label: "Show Hints"
-            description: "Display helpful usage tips and shortcuts at the bottom of the popout."
+            label: I18n.tr("Show Hints")
+            description: I18n.tr("Display helpful usage tips and shortcuts at the bottom of the popout.")
             defaultValue: true
         }
+    }
+
+    PluginAbout {
+        repoUrl: "https://github.com/hthienloc/dms-breathing"
     }
 }

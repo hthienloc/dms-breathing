@@ -5,7 +5,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Plugins
-import "../dms-common"
+import "./dms-common"
 
 
 PluginComponent {
@@ -621,11 +621,11 @@ PluginComponent {
                                 spacing: 4
 
                                 StyledText {
-                                    text: root.isPaused ? "Paused" : (
-                                        breathPhase === "inhale" ? "Breathe In" : 
-                                        breathPhase === "hold" ? "Hold" : 
-                                        breathPhase === "exhale" ? "Breathe Out" :
-                                        breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                    text: root.isPaused ? I18n.tr("Paused") : (
+                                        breathPhase === "inhale" ? I18n.tr("Breathe In") : 
+                                        breathPhase === "hold" ? I18n.tr("Hold") : 
+                                        breathPhase === "exhale" ? I18n.tr("Breathe Out") :
+                                        breathPhase === "holdAfterExhale" ? I18n.tr("Hold") : "---"
                                     )
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.bold: true
@@ -697,11 +697,11 @@ PluginComponent {
                             spacing: 4
 
                             StyledText {
-                                text: root.isPaused ? "Paused" : (
-                                    breathPhase === "inhale" ? "Breathe In" : 
-                                    breathPhase === "hold" ? "Hold" : 
-                                    breathPhase === "exhale" ? "Breathe Out" :
-                                    breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                text: root.isPaused ? I18n.tr("Paused") : (
+                                    breathPhase === "inhale" ? I18n.tr("Breathe In") : 
+                                    breathPhase === "hold" ? I18n.tr("Hold") : 
+                                    breathPhase === "exhale" ? I18n.tr("Breathe Out") :
+                                    breathPhase === "holdAfterExhale" ? I18n.tr("Hold") : "---"
                                 )
                                 font.pixelSize: Theme.fontSizeXLarge
                                 font.bold: true
@@ -765,11 +765,11 @@ PluginComponent {
                                 }
 
                                 StyledText {
-                                    text: root.isPaused ? "Paused" : (
-                                        breathPhase === "inhale" ? "Breathe In" : 
-                                        breathPhase === "hold" ? "Hold" : 
-                                        breathPhase === "exhale" ? "Breathe Out" :
-                                        breathPhase === "holdAfterExhale" ? "Hold" : "---"
+                                    text: root.isPaused ? I18n.tr("Paused") : (
+                                        breathPhase === "inhale" ? I18n.tr("Breathe In") : 
+                                        breathPhase === "hold" ? I18n.tr("Hold") : 
+                                        breathPhase === "exhale" ? I18n.tr("Breathe Out") :
+                                        breathPhase === "holdAfterExhale" ? I18n.tr("Hold") : "---"
                                     )
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.bold: true
@@ -898,7 +898,7 @@ PluginComponent {
                         spacing: 8
 
                         DankButton {
-                            text: root.isRunning ? (root.isPaused ? "Resume" : "Pause") : "Start"
+                            text: root.isRunning ? (root.isPaused ? I18n.tr("Resume") : I18n.tr("Pause")) : I18n.tr("Start")
                             width: parent.width / 2 - 4
                             height: 40
                             iconName: root.isPaused ? "play_arrow" : (root.isRunning ? "pause" : "play_arrow")
@@ -912,7 +912,7 @@ PluginComponent {
                         }
 
                         DankButton {
-                            text: "Stop"
+                            text: I18n.tr("Stop")
                             width: parent.width / 2 - 4
                             height: 40
                             backgroundColor: (root.isRunning || root.breathPhase !== "") ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : Theme.surfaceContainerHigh
@@ -925,7 +925,7 @@ PluginComponent {
 
                     DankButton {
                         visible: !root.isRunning
-                        text: root.isTestingSound ? "Stop Test" : "Test Sound"
+                        text: root.isTestingSound ? I18n.tr("Stop Test") : I18n.tr("Test Sound")
                         width: parent.width
                         height: 40
                         backgroundColor: root.isTestingSound ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15) : Theme.surfaceContainerHigh
@@ -953,15 +953,15 @@ PluginComponent {
 
                     HintItem {
                         icon: "mouse"
-                        text: "Right-click bar icon to quickly toggle Start/Pause."
+                        text: I18n.tr("Right-click bar icon to quickly toggle Start/Pause.")
                     }
                     HintItem {
                         icon: "mouse"
-                        text: "Double-click an exercise tile to start it immediately."
+                        text: I18n.tr("Double-click an exercise tile to start it immediately.")
                     }
                     HintItem {
                         icon: "keyboard"
-                        text: "Press 'Space' to Pause/Resume, 'R' to Reset."
+                        text: I18n.tr("Press 'Space' to Pause/Resume, 'R' to Reset.")
                     }
                 }
             }

@@ -1,0 +1,9 @@
+module dms.common
+ActionTile 1.0 ActionTile.qml
+HintItem 1.0 HintItem.qml
+HintSection 1.0 HintSection.qml
+PluginAbout 1.0 PluginAbout.qml
+PluginShortcut 1.0 PluginShortcut.qml
+SectionTitle 1.0 SectionTitle.qml
+SettingsCard 1.0 SettingsCard.qml
+StatusDisplay 1.0 StatusDisplay.qml
