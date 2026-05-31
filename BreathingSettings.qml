@@ -9,29 +9,33 @@ PluginSettings {
     id: root
     pluginId: "breathing"
 
-    readonly property var exercises: [
-        { name: I18n.tr("Deep Breathing"), id: "deep" },
-        { name: I18n.tr("4-7-8 Breathing"), id: "478" },
-        { name: I18n.tr("Box Breathing"), id: "box" },
-        { name: I18n.tr("Equal Breathing"), id: "equal" },
-        { name: I18n.tr("Resonance"), id: "resonance" },
-        { name: I18n.tr("Alternate Nostril"), id: "alternate" }
-    ]
-
     SettingsCard {
-        SectionTitle { text: I18n.tr("General"); icon: "tune" }
+        id: generalSection
+        SectionTitle { 
+            text: I18n.tr("General")
+            icon: "tune" 
+            showReset: enableAutoStart.isDirty || autoStartExercise.isDirty || defaultDuration.isDirty
+            onResetClicked: {
+                enableAutoStart.resetToDefault();
+                autoStartExercise.resetToDefault();
+                defaultDuration.resetToDefault();
+            }
+        }
 
-        ToggleSetting {
+        ToggleSettingPlus {
+            id: enableAutoStart
             settingKey: "enableAutoStart"
             label: I18n.tr("Auto-start Exercise")
             description: I18n.tr("Start exercise automatically on login.")
             defaultValue: false
         }
 
-        SelectionSetting {
+        Separator {}
+
+        SelectionSettingPlus {
+            id: autoStartExercise
             settingKey: "autoStartExercise"
             label: I18n.tr("Default Exercise")
-            description: I18n.tr("Exercise to start automatically.")
             options: [
                 { label: I18n.tr("Deep Breathing"), value: "0" },
                 { label: I18n.tr("4-7-8 Breathing"), value: "1" },
@@ -43,80 +47,123 @@ PluginSettings {
             defaultValue: "0"
         }
 
-        SliderSetting {
+        Separator {}
+
+        SliderSettingPlus {
+            id: defaultDuration
             settingKey: "defaultDuration"
             label: I18n.tr("Default Duration")
-            description: I18n.tr("Session length for auto-started exercises (minutes).")
+            description: I18n.tr("Session length for auto-started exercises.")
             minimum: 1
             maximum: 30
+            unit: I18n.tr("min")
             defaultValue: 5
+            leftLabel: "1m"
+            rightLabel: "30m"
         }
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Feedback"); icon: "vibration" }
+        id: feedbackSection
+        SectionTitle { 
+            text: I18n.tr("Feedback")
+            icon: "vibration" 
+            showReset: enableHaptic.isDirty || enableSound.isDirty || enableTwoTone.isDirty || soundType.isDirty || defaultSoundVolume.isDirty || customSoundPath.isDirty
+            onResetClicked: {
+                enableHaptic.resetToDefault();
+                enableSound.resetToDefault();
+                enableTwoTone.resetToDefault();
+                soundType.resetToDefault();
+                defaultSoundVolume.resetToDefault();
+                customSoundPath.resetToDefault();
+            }
+        }
 
-        ToggleSetting {
+        ToggleSettingPlus {
+            id: enableHaptic
             settingKey: "enableHaptic"
             label: I18n.tr("Haptic Feedback")
-            description: I18n.tr("Vibrate on phase transitions.")
             defaultValue: true
         }
+
+        Separator {}
         
-        ToggleSetting {
+        ToggleSettingPlus {
+            id: enableSound
             settingKey: "enableSound"
             label: I18n.tr("Sound Cues")
-            description: I18n.tr("Play subtle sounds on phase transitions.")
             defaultValue: true
         }
 
-        ToggleSetting {
+        Separator {}
+
+        ToggleSettingPlus {
+            id: enableTwoTone
             settingKey: "enableTwoTone"
             label: I18n.tr("Two-Tone Model")
-            description: I18n.tr("Play a distinct falling pitch during exhale (default plays rising pitch on inhale only).")
+            description: I18n.tr("Play falling pitch during exhale (default is inhale only).")
             defaultValue: false
+            visible: enableSound.value
         }
 
-        SelectionSetting {
+        Separator { visible: enableSound.value }
+
+        SelectionSettingPlus {
+            id: soundType
             settingKey: "soundType"
             label: I18n.tr("Sound Cue Type")
-            description: I18n.tr("Select which sound cue to play during exercises.")
             options: [
-                { label: I18n.tr("Singing Bowl Chime (Default)"), value: "chime" },
-                { label: I18n.tr("Ambient Meditation Music"), value: "meditation" },
+                { label: I18n.tr("Singing Bowl Chime"), value: "chime" },
+                { label: I18n.tr("Ambient Meditation"), value: "meditation" },
                 { label: I18n.tr("Custom Sound File"), value: "custom" }
             ]
             defaultValue: "chime"
+            visible: enableSound.value
         }
 
-        SliderSetting {
+        Separator { visible: enableSound.value }
+
+        SliderSettingPlus {
+            id: defaultSoundVolume
             settingKey: "defaultSoundVolume"
-            label: I18n.tr("Default Volume")
-            description: I18n.tr("Default volume for breathing sound cues.")
+            label: I18n.tr("Sound Volume")
             defaultValue: 80
             minimum: 0
             maximum: 100
             unit: "%"
-            leftIcon: "volume_down"
-            rightIcon: "volume_up"
+            leftLabel: "0%"
+            rightLabel: "100%"
+            visible: enableSound.value
         }
 
-        StringSetting {
+        Separator { visible: enableSound.value && soundType.value === "custom" }
+
+        StringSettingPlus {
+            id: customSoundPath
             settingKey: "customSoundPath"
             label: I18n.tr("Custom Sound File")
-            description: I18n.tr("Absolute path to custom audio. Only active when Sound Cue Type is set to Custom Sound File.")
+            description: I18n.tr("Absolute path to custom audio.")
             placeholder: "/home/user/sounds/my-sound.ogg"
             defaultValue: ""
+            visible: enableSound.value && soundType.value === "custom"
+            isFile: true
+            fileExtensions: [I18n.tr("Audio files") + " (*.mp3 *.wav *.ogg *.oga *.flac)", I18n.tr("All files") + " (*)"]
         }
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Appearance"); icon: "palette" }
+        id: appearanceSection
+        SectionTitle { 
+            text: I18n.tr("Appearance")
+            icon: "palette" 
+            showReset: animationStyle.isDirty
+            onResetClicked: animationStyle.resetToDefault()
+        }
 
-        SelectionSetting {
+        SelectionSettingPlus {
+            id: animationStyle
             settingKey: "animationStyle"
             label: I18n.tr("Animation Style")
-            description: I18n.tr("Visual style of the breathing visualizer.")
             options: [
                 { label: I18n.tr("Classic Card"), value: "classic" },
                 { label: I18n.tr("Expanding Circle"), value: "circle" },
@@ -128,13 +175,39 @@ PluginSettings {
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Behavior"); icon: "settings" }
+        id: behaviorSection
+        SectionTitle { 
+            text: I18n.tr("Behavior")
+            icon: "settings" 
+            showReset: showHints.isDirty
+            onResetClicked: showHints.resetToDefault()
+        }
 
-        ToggleSetting {
+        ToggleSettingPlus {
+            id: showHints
             settingKey: "showHints"
             label: I18n.tr("Show Hints")
-            description: I18n.tr("Display helpful usage tips and shortcuts at the bottom of the popout.")
             defaultValue: true
+        }
+    }
+
+    SettingsCard {
+        SectionTitle { 
+            id: usageTitle
+            text: I18n.tr("Usage Guide")
+            icon: "menu_book" 
+            collapsible: true
+            settingKey: "usageGuideExpanded"
+        }
+
+        UsageGuide {
+            expanded: usageTitle.isExpanded
+            items: [
+                I18n.tr("<b>Left-click</b> the pill to start/pause the breathing session."),
+                I18n.tr("<b>Right-click</b> the pill to stop and reset the session."),
+                I18n.tr("Open the <b>Popout</b> to choose different breathing techniques."),
+                I18n.tr("Follow the <b>visual guide</b> and <b>sound cues</b> to sync your breath.")
+            ]
         }
     }
 
