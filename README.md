@@ -4,6 +4,11 @@ Guided breathing techniques for relaxation and focus.
 
 <img src="screenshot.png" width="400" alt="Screenshot">
 
+
+## Requirements
+- `mpv`
+- `socat`
+
 ## Install
 
 Use the DMS CLI:
